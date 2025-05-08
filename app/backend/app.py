@@ -70,10 +70,12 @@ async def create_app():
        - Ask for their member number if they haven't provided it
        - Say "Let me check your recent login activity to help diagnose the issue" before proceeding
        - Use the `get_auth0_logs` tool with their member number to check their recent login attempts
-       - Review the logs to identify any error patterns or failed login attempts
-       - Use the `search` tool again with specific error codes or patterns found in the logs
-       - Combine the log information with knowledge base results to quickly determine a solution
-       - Explain the solution in simple terms and guide the user through resolving their issue
+       - IMPORTANT: Look at the "SUMMARY OF RECENT ACTIVITY" section and note the most recent error code
+       - IMMEDIATELY use the `search` tool with the exact error code (e.g., "error code f" or "auth0 error code refresh_tokens_revoked_by_session")
+       - For failed logins (status "Failed" or error code "f"), search specifically for "failed login" or "error code f"
+       - Match the exact error code from the logs with information in the knowledge base
+       - Determine the solution based on the error code explanation in the knowledge base
+       - Explain the issue and solution in simple terms and guide the user through resolving their problem
     4. Produce an answer as short as possible. If you can't find the answer in the knowledge base, say "I don't know."  
 
     """.strip()

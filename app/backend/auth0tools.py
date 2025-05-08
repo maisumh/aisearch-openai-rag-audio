@@ -52,19 +52,48 @@ async def _auth0_logs_tool(args: dict) -> ToolResult:
                     if not result or len(result) == 0:
                         formatted_result += "No login records found."
                     else:
-                        for entry in result:
-                            date = entry.get("date", "Unknown date")
-                            login_type = entry.get("type", "Unknown event")
-                            success = "Successful" if entry.get("success", False) else "Failed"
-                            description = entry.get("description", "No description")
-                            ip = entry.get("ip", "Unknown IP")
+                        formatted_result += "MOST RECENT ACTIVITY:\n"
+                        # First, we sort the entries by timestamp (most recent first)
+                        sorted_entries = sorted(result, key=lambda x: x.get("event_time_utc", ""), reverse=True)
+                        
+                        for i, entry in enumerate(sorted_entries):
+                            # Get all possible fields from the entry
+                            date = entry.get("event_time_cst", entry.get("date", "Unknown date"))
+                            user_name = entry.get("user_name", "Unknown user")
+                            name = entry.get("name", "")
+                            error_code = entry.get("error_code", "Unknown error code")
+                            login_status = entry.get("LoginStatus", entry.get("status", "Unknown status"))
                             
+                            # Display activity number
+                            formatted_result += f"ACTIVITY #{i+1}:\n"
                             formatted_result += f"Date: {date}\n"
-                            formatted_result += f"Event: {login_type}\n"
-                            formatted_result += f"Status: {success}\n"
-                            formatted_result += f"Description: {description}\n"
-                            formatted_result += f"IP: {ip}\n"
+                            formatted_result += f"Username: {user_name}\n"
+                            if name:
+                                formatted_result += f"Name: {name}\n"
+                            formatted_result += f"Status: {login_status}\n"
+                            formatted_result += f"Error Code: {error_code}\n"
+                            
+                            # Highlight if this is a failed login
+                            if login_status == "Failed" or error_code.lower() == "f":
+                                formatted_result += "ACTION NEEDED: This appears to be a failed login attempt. Search the knowledge base for error code 'f' for details.\n"
+                            elif error_code and error_code != "s" and error_code != "seacft":
+                                formatted_result += f"ACTION NEEDED: Check error code '{error_code}' in the knowledge base for details.\n"
+                                
                             formatted_result += "-----\n"
+                            
+                            # Only display the first 3 entries to avoid cluttering
+                            if i >= 2:
+                                break
+                                
+                        # Add a summary section highlighting the most recent issue
+                        formatted_result += "\nSUMMARY OF RECENT ACTIVITY:\n"
+                        if sorted_entries and len(sorted_entries) > 0:
+                            most_recent = sorted_entries[0]
+                            error_code = most_recent.get("error_code", "")
+                            login_status = most_recent.get("LoginStatus", "")
+                            
+                            formatted_result += f"Most recent activity shows status: {login_status} with error code: {error_code}\n"
+                            formatted_result += "Please search the knowledge base for this specific error code to find the appropriate solution.\n"
                     
                     return ToolResult(formatted_result, ToolResultDirection.TO_SERVER)
                 else:
