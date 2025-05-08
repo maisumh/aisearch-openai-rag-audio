@@ -9,7 +9,10 @@ _auth0_logs_tool_schema = {
     "type": "function",
     "name": "get_auth0_logs",
     "description": "Retrieves Auth0 login logs for a member to help diagnose login issues. " + \
-                  "Use this when a user is having trouble logging in and you need to see their recent login attempts.",
+                  "Use this when a user is having trouble logging in and you need to see their recent login attempts. " + \
+                  "The logs will show success/failure status, error messages, and other details that can help " + \
+                  "identify patterns or specific issues. Use this information together with the knowledge base " + \
+                  "to diagnose problems and find solutions for the member.",
     "parameters": {
         "type": "object",
         "properties": {
