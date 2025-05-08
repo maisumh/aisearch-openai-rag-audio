@@ -8,6 +8,7 @@ from azure.identity import AzureDeveloperCliCredential, DefaultAzureCredential
 from dotenv import load_dotenv
 
 from ragtools import attach_rag_tools
+from auth0tools import attach_auth0_tools
 from rtmt import RTMiddleTier
 
 logging.basicConfig(level=logging.INFO)
@@ -65,7 +66,8 @@ async def create_app():
     Always use these step-by-step instructions when responding:  
     1. Use the `search` tool to check the knowledge base before answering.  
     2. Use the `report_grounding` tool to report your information source.  
-    3. Produce an answer as short as possible. If you can't find the answer in the knowledge base, say “I don't know.”  
+    3. If the user is having login issues, use the `get_auth0_logs` tool with their member number to check their recent login attempts.
+    4. Produce an answer as short as possible. If you can't find the answer in the knowledge base, say "I don't know."  
 
     """.strip()
 
@@ -80,6 +82,9 @@ async def create_app():
         title_field=os.environ.get("AZURE_SEARCH_TITLE_FIELD") or "title",
         use_vector_query=(os.getenv("AZURE_SEARCH_USE_VECTOR_QUERY", "true") == "true")
         )
+    
+    # Attach Auth0 tools
+    attach_auth0_tools(rtmt)
 
     rtmt.attach_to_app(app, "/realtime")
 
