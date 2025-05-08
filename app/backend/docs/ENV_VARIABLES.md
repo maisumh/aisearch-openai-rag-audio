@@ -6,7 +6,7 @@ This document describes all environment variables used by the application.
 
 - `AZURE_OPENAI_API_KEY`: API key for Azure OpenAI
 - `AZURE_OPENAI_ENDPOINT`: Endpoint URL for Azure OpenAI
-- `AZURE_OPENAI_REALTIME_DEPLOYMENT`: Deployment name for Realtime API
+- `AZURE_OPENAI_REALTIME_DEPLOYMENT`: Deployment name for Realtime API (recommended model is "gpt-4o-mini-realtime-preview")
 - `AZURE_OPENAI_REALTIME_VOICE_CHOICE`: Voice to use (defaults to "coral")
 
 ## Azure AI Search Configuration

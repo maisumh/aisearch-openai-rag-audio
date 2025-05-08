@@ -61,7 +61,7 @@ class RTMiddleTier:
     max_tokens: Optional[int] = None
     disable_audio: Optional[bool] = None
     voice_choice: Optional[str] = None
-    api_version: str = "2024-10-01-preview"
+    api_version: str = "2025-04-01-preview"
     _tools_pending = {}
     _token_provider = None
 
@@ -172,6 +172,12 @@ class RTMiddleTier:
                         session["disable_audio"] = self.disable_audio
                     if self.voice_choice is not None:
                         session["voice"] = self.voice_choice
+                    # Set VAD settings to server_vad for better speech detection
+                    if "turn_detection" not in session:
+                        session["turn_detection"] = {
+                            "type": "server_vad",
+                            "create_response": True
+                        }
                     session["tool_choice"] = "auto" if len(self.tools) > 0 else "none"
                     session["tools"] = [tool.schema for tool in self.tools.values()]
                     updated_message = json.dumps(message)
