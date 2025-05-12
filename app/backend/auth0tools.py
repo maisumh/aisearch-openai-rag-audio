@@ -77,7 +77,7 @@ async def _auth0_logs_tool(args: dict) -> ToolResult:
                             if login_status == "Failed" or error_code.lower() == "f":
                                 formatted_result += "ACTION NEEDED: This appears to be a failed login attempt. Search the knowledge base for error code 'f' for details.\n"
                             elif error_code and error_code != "s" and error_code != "seacft":
-                                formatted_result += f"ACTION NEEDED: Check error code '{error_code}' in the knowledge base for details.\n"
+                                formatted_result += f"ACTION NEEDED: Looks like a successful login. Check code '{error_code}' in the knowledge base for details.\n"
                                 
                             formatted_result += "-----\n"
                             
