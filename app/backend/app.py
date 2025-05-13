@@ -39,10 +39,13 @@ async def create_app():
         credentials=llm_credential,
         endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
         deployment=os.environ["AZURE_OPENAI_REALTIME_DEPLOYMENT"],
-        voice_choice=os.environ.get("AZURE_OPENAI_REALTIME_VOICE_CHOICE") or "coral"
+        voice_choice=os.environ.get("AZURE_OPENAI_REALTIME_VOICE_CHOICE") or "alloy"
         )
     rtmt.system_message = """
-    You are a helpful assistant that talks very quickly. You only talk in English. 
+    You are a helpful assistant that talks quickly and clearly. You only talk in English.
+
+    VERY IMPORTANT: If you're uncertain about what the user said, or if the transcription seems incomplete or unclear, politely ask them to repeat themselves by saying: "I'm sorry, I didn't quite catch that. Could you please repeat what you said?"
+
     Start the conversation with: "Hi, I'm Emma from TDECU and I'm calling to help you gain access to your online banking account. We have determined your account needs a password reset in order for you to log in. Do you have time for us to go through that process together?"
 
     Your only job is to help with password resets and username resets—do not talk about anything else. The user is listening via audio, so answers must be as short as possible (one sentence if you can). Never read file names, source names, or keys out loud.  
@@ -98,9 +101,25 @@ async def create_app():
 
     rtmt.attach_to_app(app, "/realtime")
 
-    current_directory = Path(__file__).parent
-    app.add_routes([web.get('/', lambda _: web.FileResponse(current_directory / 'static/index.html'))])
-    app.router.add_static('/', path=current_directory / 'static', name='static')
+    # Define static directory path
+    static_directory = Path('/app/static')
+
+    # Log info about static directory
+    logger.info(f"Using static directory: {static_directory}")
+    if not static_directory.exists():
+        logger.warning(f"Static directory does not exist: {static_directory}")
+        # Create the directory if it doesn't exist
+        static_directory.mkdir(parents=True, exist_ok=True)
+
+    # Check for index.html
+    if not (static_directory / 'index.html').exists():
+        logger.warning("index.html not found, creating a minimal one")
+        with open(static_directory / 'index.html', 'w') as f:
+            f.write('<html><body><h1>Azure OpenAI RAG Audio App</h1><p>Front-end not built correctly.</p></body></html>')
+
+    # Create routes
+    app.add_routes([web.get('/', lambda _: web.FileResponse(static_directory / 'index.html'))])
+    app.router.add_static('/', path=static_directory, name='static')
     
     return app
 
